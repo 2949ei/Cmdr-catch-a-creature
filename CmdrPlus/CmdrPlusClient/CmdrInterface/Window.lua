@@ -157,8 +157,9 @@ function Window:HideInvalidState()
 end
 
 -- Event handler for text box focus lost
-function Window:LoseFocus(submit)
+function Window:LoseFocus(submit, InputObject)
 	local text = Entry.TextBox.Text
+	local IsValidKey = InputObject and InputObject.KeyCode == Enum.KeyCode.Return 
 
 	self:ClearHistoryState()
 
@@ -169,11 +170,11 @@ function Window:LoseFocus(submit)
 		self:Hide()
 	end
 
-	if submit and self.Valid then
+	if submit and self.Valid and IsValidKey then
 		wait()
 		self:SetEntryText("")
 		self.ProcessEntry(text)
-	elseif submit then
+	elseif submit and IsValidKey then
 		self:AddLine(self._errorText, Color3.fromRGB(255, 153, 153))
 	end
 end
@@ -322,8 +323,8 @@ function Window:BeginInput(input, gameProcessed)
 end
 
 -- Hook events
-Entry.TextBox.FocusLost:Connect(function(submit)
-	return Window:LoseFocus(submit)
+Entry.TextBox.FocusLost:Connect(function(submit, InputObject)
+	return Window:LoseFocus(submit, InputObject)
 end)
 
 UserInputService.InputBegan:Connect(function(input, gameProcessed)

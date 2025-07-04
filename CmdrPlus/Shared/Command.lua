@@ -189,10 +189,12 @@ function Command:Run()
 	if afterRunHook then
 		return afterRunHook
 	else
-		if typeof(self.Response) == "table" and self.Response.line then
-		elseif typeof(self.Response) ~= "string" then
+		if typeof(self.Response) == "table" and not self.Response.line then
+			error("Command return data is not valid to be diplayed")
+		elseif typeof(self.Response) == "string" then
 			self.Response = { line = self.Response }
 		end
+		
 		return self.Response
 	end
 end

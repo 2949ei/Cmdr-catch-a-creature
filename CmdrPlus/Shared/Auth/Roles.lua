@@ -60,8 +60,6 @@ function Roles.GetRoles()
 		role.Alias = i
 	end
 
-	print(ROLES)
-
 	return ROLES
 end
 

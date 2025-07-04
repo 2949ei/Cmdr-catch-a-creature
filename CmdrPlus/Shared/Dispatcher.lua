@@ -268,6 +268,7 @@ function Dispatcher:RunHooks(hookName: string, commandContext, ...)
 				return value
 			end
 
+			print(value)
 			return tostring(value)
 		end
 	end

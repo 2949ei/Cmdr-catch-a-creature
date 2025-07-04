@@ -10,18 +10,18 @@
 ```lua
 -- This is a script you would create in ServerScriptService, for example.
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Cmdr = require(path.to.Cmdr)
+local CmdrPlus = require(path.to.CmdrPlus)
 
-Cmdr:RegisterDefaultCommands() -- This loads the default set of commands that Cmdr comes with. (Optional)
--- Cmdr:RegisterCommandsIn(script.Parent.CmdrCommands) -- Register commands from your own folder. (Optional)
+CmdrPlus:RegisterDefaultCommands() -- This loads the default set of commands that Cmdr comes with. (Optional)
+-- CmdrPlus:RegisterCommandsIn(script.Parent.CmdrCommands) -- Register commands from your own folder. (Optional)
 ```
 
 ### CmdrClient
 ```lua
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Cmdr = require(ReplicatedStorage:WaitForChild("CmdrClient"))
+local CmdrPlus = require(ReplicatedStorage:WaitForChild("CmdrPlusClient"))
 
 -- Configurable, and you can choose multiple keys
-Cmdr:Init()
+CmdrPlus:Init()
 -- See below for the full API.
 ```

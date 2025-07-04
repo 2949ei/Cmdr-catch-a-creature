@@ -14,7 +14,7 @@ return function(cmdr)
 		return object
 	end
 
-	ReplicatedRoot = script.Parent.CmdrClient
+	ReplicatedRoot = script.Parent.CmdrPlusClient
 	ReplicatedRoot.Parent = ReplicatedStorage
 
 	RemoteFunction = Create("RemoteFunction", "CmdrFunction")

@@ -206,7 +206,11 @@ function Cmdr:HandleEvent(name: string, callback: (...any) -> ())
 end
 
 function Cmdr:Init()
-	self:SetActivationKeys(self.Settings.ActivationKeys)
+	if self.Auth.IsAuthorized(game.Players.LocalPlayer.UserId) then
+		self:SetActivationKeys(self.Settings.ActivationKeys)
+	else
+		self:SetActivationKeys({})
+	end
 end
 -- "Only register when we aren't in studio because don't want to overwrite what the server portion did"
 -- This is legacy code which predates Accurate Play Solo (which is now the only way to test in studio), this code will never run.
