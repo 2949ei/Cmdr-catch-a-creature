@@ -53,7 +53,7 @@ end
 local Roles = {}
 
 function Roles.GetRoles()
-	for i, role in pairs(ROLES) do
+	for _, role in pairs(ROLES) do
 		IncludeRolesPermissions(role)
 	end
 

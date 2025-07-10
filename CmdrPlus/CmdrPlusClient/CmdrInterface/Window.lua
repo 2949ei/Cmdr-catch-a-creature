@@ -16,6 +16,7 @@ local Window = {
 	OnTextChanged = nil,
 	Cmdr = nil,
 	HistoryState = nil,
+	Notifications = nil
 }
 
 local Gui = Player:WaitForChild("PlayerGui"):WaitForChild("Cmdr"):WaitForChild("Frame")

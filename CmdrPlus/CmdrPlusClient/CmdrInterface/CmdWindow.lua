@@ -20,10 +20,9 @@ return function(Cmdr)
 	local CmdWindow = {
 		CommandData = nil,
 		ProcessEntry = nil,
+		Notifications = nil,
 		Cmdr = Cmdr,
 	}
-
-	local Util = Cmdr.Util
 
 	local Detect = Player:WaitForChild("PlayerGui"):WaitForChild("Cmdr"):WaitForChild("Detect") :: Frame
 	local Gui = Player:WaitForChild("PlayerGui"):WaitForChild("Cmdr"):WaitForChild("Cmd") :: Frame
@@ -110,12 +109,12 @@ return function(Cmdr)
 			btn:Destroy()
 		end
 
-		for _, item in items do
+		for index, item in items do
 			local newitem = DropButton:Clone()
 			newitem.Parent = DropList
 			newitem.Text = item
 			newitem.Name = item
-			newitem.LayoutOrder = _
+			newitem.LayoutOrder = index
 			newitem.Visible = true
 			newitem.Active = true
 			newitem.Activated:Connect(function()
@@ -162,7 +161,7 @@ return function(Cmdr)
 
 			local pos = (button.AbsolutePosition + button.AbsoluteSize)
 			DropMenu.Position = UDim2.fromOffset(pos.X, pos.Y)
-			local strings, options = Argument:GetDefaultAutocomplete()
+			local strings = Argument:GetDefaultAutocomplete()
 			self:LoadDropdown(strings, Argument.Type.Listable, function(item, overide)
 				local List = self.CommandData.Args[_index]
 				if overide then
@@ -221,23 +220,23 @@ return function(Cmdr)
 		local i = 0
 		for group, cmds in SortedByGroup do
 			i += 1
-			local Header = HeaderSample:Clone()
-			Header.Parent = CmdList
-			Header.LayoutOrder = i * 10000
-			Header.Label.Text = group
-			Header.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-			Header.Visible = true
+			local newHeader = HeaderSample:Clone()
+			newHeader.Parent = CmdList
+			newHeader.LayoutOrder = i * 10000
+			newHeader.Label.Text = group
+			newHeader.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+			newHeader.Visible = true
 
 			for pos, cmd in cmds do
-				local Cmd = CmdSample:Clone()
-				Cmd.Active = true
-				Cmd.Name = cmd.Name
-				Cmd.Parent = CmdList
-				Cmd.LayoutOrder = (i * 10000) + pos
-				Cmd.Label.Text = cmd.Name
-				Cmd.BackgroundColor3 = if pos % 2 == 0 then Color3.fromRGB(0, 0, 0) else Color3.fromRGB(17, 17, 17)
-				Cmd.Visible = true
-				Cmd.Activated:Connect(function()
+				local newCmd = CmdSample:Clone()
+				newCmd.Active = true
+				newCmd.Name = cmd.Name
+				newCmd.Parent = CmdList
+				newCmd.LayoutOrder = (i * 10000) + pos
+				newCmd.Label.Text = cmd.Name
+				newCmd.BackgroundColor3 = if pos % 2 == 0 then Color3.fromRGB(0, 0, 0) else Color3.fromRGB(17, 17, 17)
+				newCmd.Visible = true
+				newCmd.Activated:Connect(function()
 					self:LoadCommandArguments(cmd.Name)
 				end)
 			end
@@ -275,13 +274,15 @@ return function(Cmdr)
 	end
 
 	function CmdWindow:DisplayLine(data)
-		local text, options = "", {}
+		local text, options, waittime = "", {}, nil
 		if typeof(data) == "table" and data.line then
 			options = data.color or {}
 			text = tostring(data.line)
+			waittime = data.waittime
 		else
 			options = options or {}
 			text = tostring(data)
+			waittime = waittime
 		end
 	
 		if typeof(options) == "Color3" then
@@ -292,13 +293,20 @@ return function(Cmdr)
 			return
 		end
 
-		Run.Active = false
-		InfoLabel.Visible = true
-		InfoLabel.Text = text
-		InfoLabel.TextColor3 = options.Color or InfoLabel.TextColor3
-		task.wait(1)
-		Run.Active = true
-		InfoLabel.Visible = false
+		local Colors = CmdWindow.Cmdr.Settings.Colors
+		local errored = text:match("An error") ~= nil
+
+		self.Notifications:Queue({
+			Title = errored and "" or "Succes",
+			Body = text,
+			ImageId = {
+				Image = "rbxassetid://16898617325",
+				ImageRectOffset = Vector2.new(514, 257),
+				ImageRectSize = Vector2.new(256, 256),
+			},
+			Color = options.Color or errored and Colors.Error or Colors.Success,
+			Lifetime = waittime or not errored and 2 or errored and 5,
+		})
 	end
 
 	function CmdWindow:IsVisible()
@@ -352,7 +360,7 @@ return function(Cmdr)
 
 	DropSearch:GetPropertyChangedSignal("Text"):Connect(function()
 		local NewText = DropSearch.Text
-		for i, v in DropList:GetChildren() do
+		for _, v in DropList:GetChildren() do
 			if v:IsA("TextButton") and v ~= DropButton then
 				if NewText ~= "" then
 					v.Visible = string.find(v.Text, NewText)
@@ -372,11 +380,23 @@ return function(Cmdr)
 		if commandValid then
 			local Text = Command.Name
 
-			for i, arg in Command.Arguments do
+			for _, arg in Command.Arguments do
 				Text ..= ` {arg.RawValue}`
 			end
 
 			CmdWindow.ProcessEntry(Text)
+		else
+			CmdWindow.Notifications:Queue({
+				Title = "Errored",
+				Body = errorText,
+				ImageId = {
+					Image = "rbxassetid://16898791187",
+					ImageRectOffset = Vector2.new(257, 514),
+					ImageRectSize =  Vector2.new(256, 256),
+				},
+				Color = CmdWindow.Cmdr.Settings.Colors.Error,
+				Lifetime = 5
+			})
 		end
 	end)
 

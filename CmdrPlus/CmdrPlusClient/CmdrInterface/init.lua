@@ -5,12 +5,15 @@ local Player = Players.LocalPlayer
 
 return function(Cmdr)
 	local Util = Cmdr.Util
+	local Notifications = require(script:WaitForChild("Notifications"))
 
 	local Window = require(script:WaitForChild("Window"))
 	Window.Cmdr = Cmdr
-
+	Window.Notifications = Notifications
+	
 	local CmdWindow = require(script:WaitForChild("CmdWindow"))(Cmdr)
-
+	CmdWindow.Notifications = Notifications
+	
 	local AutoComplete = require(script:WaitForChild("AutoComplete"))(Cmdr)
 	Window.AutoComplete = AutoComplete
 
@@ -20,10 +23,12 @@ return function(Cmdr)
 		if #text == 0 then
 			return
 		end
-		
-		CmdWindow:DisplayLine(Cmdr.Dispatcher:EvaluateAndRun(text, Player, {
+
+		local result = Cmdr.Dispatcher:EvaluateAndRun(text, Player, {
 			IsHuman = true,
-		}))
+		})
+
+		CmdWindow:DisplayLine(result)
 	end
 
 	-- Sets the Window.ProcessEntry callback so that we can dispatch our commands out
@@ -54,7 +59,6 @@ return function(Cmdr)
 		end
 
 		local entryComplete = commandText and #arguments > 0
-		local acommand = AutoComplete.Command
 
 		if text:sub(#text, #text):match("%s") and not atEnd then
 			entryComplete = true
@@ -117,8 +121,8 @@ return function(Cmdr)
 			local exactMatch
 			if exactCommand then
 				exactMatch = {
-					exactCommand.Name,
-					exactCommand.Name,
+					[1] = exactCommand.Name,
+					[2] = exactCommand.Name,
 					options = {
 						name = exactCommand.Name,
 						description = exactCommand.Description,
@@ -152,8 +156,8 @@ return function(Cmdr)
 				then
 					local commandObject = Cmdr.Registry:GetCommand(cmd)
 					acItems[#acItems + 1] = {
-						commandText,
-						cmd,
+						[1] = commandText,
+						[2] = cmd,
 						options = {
 							name = commandObject.Name,
 							description = commandObject.Description,
@@ -167,6 +171,7 @@ return function(Cmdr)
 
 		Window:SetIsValidInput(false, "Use the help command to see all available commands.")
 		AutoComplete:Hide()
+		return
 	end
 
 	Window:UpdateLabel()
@@ -175,6 +180,6 @@ return function(Cmdr)
 	return {
 		Window = Window,
 		AutoComplete = AutoComplete,
-		CmdWindow = CmdWindow
+		CmdWindow = CmdWindow,
 	}
 end

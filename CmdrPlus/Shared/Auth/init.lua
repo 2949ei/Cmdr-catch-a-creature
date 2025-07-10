@@ -35,6 +35,10 @@ function Auth.IsRankPermitted(identifier)
 		return GroupService:GetGroupsAsync(identifier), true
 	end)
 
+	if not success then
+		return false
+	end
+
 	if groups then
 		if update then
 			Cache[identifier] = {

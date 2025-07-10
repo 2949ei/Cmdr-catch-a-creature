@@ -1,4 +1,5 @@
 local CmdGui = require(script.Parent.CmdGui)
+local NotificationGui = require(script.Parent.NotificationGui)
 return function()
 	local Cmdr = Instance.new("ScreenGui")
 	Cmdr.DisplayOrder = 1000
@@ -214,6 +215,7 @@ return function()
 	Type.Parent = Field
 
 	CmdGui(Cmdr)
+	NotificationGui(Cmdr)
 	Cmdr.Parent = game:GetService("StarterGui")
 	return Cmdr
 end
