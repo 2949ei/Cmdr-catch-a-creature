@@ -4,7 +4,7 @@ return {
 	Name = "version",
 	Args = {},
 	Description = "Shows the current version of Cmdrplus",
-	Group = "DefaultDebug",
+	Group = "Default",
 
 	ClientRun = function()
 		return {line = ("Cmdr Version %s"):format(version), color = nil}

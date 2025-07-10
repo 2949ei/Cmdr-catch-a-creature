@@ -1,3 +1,4 @@
+local CmdGui = require(script.Parent.CmdGui)
 return function()
 	local Cmdr = Instance.new("ScreenGui")
 	Cmdr.DisplayOrder = 1000
@@ -212,6 +213,7 @@ return function()
 	Type.TextXAlignment = Enum.TextXAlignment.Left
 	Type.Parent = Field
 
+	CmdGui(Cmdr)
 	Cmdr.Parent = game:GetService("StarterGui")
 	return Cmdr
 end

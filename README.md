@@ -12,6 +12,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CmdrPlus = require(path.to.CmdrPlus)
 
+--CmdrPlus.Settings = {} --here your custom settings
 CmdrPlus:RegisterDefaultCommands() -- This loads the default set of commands that Cmdr comes with. (Optional)
 -- CmdrPlus:RegisterCommandsIn(script.Parent.CmdrCommands) -- Register commands from your own folder. (Optional)
 ```
@@ -21,6 +22,7 @@ CmdrPlus:RegisterDefaultCommands() -- This loads the default set of commands tha
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CmdrPlus = require(ReplicatedStorage:WaitForChild("CmdrPlusClient"))
 
+--CmdrPlus.Settings = {} --here your custom settings
 -- Configurable, and you can choose multiple keys
 CmdrPlus:Init()
 -- See below for the full API.

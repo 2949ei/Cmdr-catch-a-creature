@@ -49,6 +49,10 @@ function Command.new(options)
 	return self
 end
 
+function Command:ExecutorHasPermissionLevel(Role)
+	return self.Cmdr.Auth.IsAuthorizedLevel(self.Executor.UserId, Role)
+end
+
 function Command:ExecutorHasPermission(Permission)
 	return self.Cmdr.Auth.IsAuthorized(self.Executor.UserId, Permission)
 end

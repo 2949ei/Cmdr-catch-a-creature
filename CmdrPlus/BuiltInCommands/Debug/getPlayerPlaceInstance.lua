@@ -2,7 +2,7 @@ return {
 	Name = "get-player-place-instance",
 	Aliases = {},
 	Description = "Returns the target player's Place ID and the JobId separated by a space. Returns 0 if the player is offline or something else goes wrong.",
-	Group = "DefaultDebug",
+	Group = "Default",
 	Args = {
 		{
 			Type = "playerId",

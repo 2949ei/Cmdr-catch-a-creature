@@ -2,7 +2,7 @@ return {
 	Name = "fetch",
 	Aliases = {},
 	Description = "Fetch a value from the Internet",
-	Group = "DefaultDebug",
+	Group = "Default",
 	Args = {
 		{
 			Type = "url",

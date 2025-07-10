@@ -2,6 +2,7 @@ local Roles = require(script.Parent.Auth.Roles).GetRoles()
 
 local Settings = {
 	ActivationKeys = { Enum.KeyCode.F2 }, -- Configurable, and you can choose multiple keys
+	CmdActivationKeys = { Enum.KeyCode.F3 }, -- Configurable, and you can choose multiple keys
 	Colors = {
 		Success = Color3.fromRGB(153, 255, 153),
 		Warning = Color3.fromRGB(255, 211, 153),
@@ -9,7 +10,7 @@ local Settings = {
 	},
 	UserRanks = {
 		--[userid] = Role
-		[99598328] = Roles.Owner,
+		[game.CreatorId] = Roles.Owner,
 	},
 	GroupRanks = {
 		{
@@ -21,6 +22,14 @@ local Settings = {
 			},
 		},
 	},
+	InputFieldTypes = {
+		"string","number","integer",
+		"url","positiveInteger","nonNegativeInteger",
+		"byte","digit","boolean",
+		"strings","numbers","integers",
+		"urls","positiveIntegers","nonNegativeIntegers",
+		"bytes","digits","booleans",
+	}
 }
 
 return Settings

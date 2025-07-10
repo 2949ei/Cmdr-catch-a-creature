@@ -66,6 +66,7 @@ do
 		RemoteFunction = script:WaitForChild("CmdrFunction"),
 		RemoteEvent = script:WaitForChild("CmdrEvent"),
 		ActivationKeys = { [Enum.KeyCode.F2] = true },
+		CmdActivationKeys = { [Enum.KeyCode.F3] = true },
 		Enabled = true,
 		MashToEnable = false,
 		ActivationUnlocksMouse = false,
@@ -105,6 +106,10 @@ local Interface = require(script.CmdrInterface)(Cmdr)
 ]=]
 function Cmdr:SetActivationKeys(keys: { Enum.KeyCode })
 	self.ActivationKeys = Util.MakeDictionary(keys)
+end
+
+function Cmdr:SetCmdActivationKeys(keys: { Enum.KeyCode })
+	self.CmdActivationKeys = Util.MakeDictionary(keys)
 end
 
 --[=[
@@ -208,8 +213,10 @@ end
 function Cmdr:Init()
 	if self.Auth.IsAuthorized(game.Players.LocalPlayer.UserId) then
 		self:SetActivationKeys(self.Settings.ActivationKeys)
+		self:SetCmdActivationKeys(self.Settings.CmdActivationKeys)
 	else
 		self:SetActivationKeys({})
+		self:SetCmdActivationKeys({})
 	end
 end
 -- "Only register when we aren't in studio because don't want to overwrite what the server portion did"
@@ -217,6 +224,7 @@ end
 if RunService:IsServer() == false then
 	Cmdr.Registry:RegisterTypesIn(script:WaitForChild("Types"))
 	Cmdr.Registry:RegisterCommandsIn(script:WaitForChild("Commands"))
+	Interface.CmdWindow:Refesh()
 end
 
 -- Hook up event listener

@@ -9,8 +9,22 @@ return function(Cmdr)
 	local Window = require(script:WaitForChild("Window"))
 	Window.Cmdr = Cmdr
 
+	local CmdWindow = require(script:WaitForChild("CmdWindow"))(Cmdr)
+
 	local AutoComplete = require(script:WaitForChild("AutoComplete"))(Cmdr)
 	Window.AutoComplete = AutoComplete
+
+	function CmdWindow.ProcessEntry(text)
+		text = Util.TrimString(text)
+
+		if #text == 0 then
+			return
+		end
+		
+		CmdWindow:DisplayLine(Cmdr.Dispatcher:EvaluateAndRun(text, Player, {
+			IsHuman = true,
+		}))
+	end
 
 	-- Sets the Window.ProcessEntry callback so that we can dispatch our commands out
 	function Window.ProcessEntry(text)
@@ -40,6 +54,7 @@ return function(Cmdr)
 		end
 
 		local entryComplete = commandText and #arguments > 0
+		local acommand = AutoComplete.Command
 
 		if text:sub(#text, #text):match("%s") and not atEnd then
 			entryComplete = true
@@ -160,5 +175,6 @@ return function(Cmdr)
 	return {
 		Window = Window,
 		AutoComplete = AutoComplete,
+		CmdWindow = CmdWindow
 	}
 end

@@ -2,7 +2,7 @@ return {
 	Name = "announce",
 	Aliases = { "m" },
 	Description = "Makes a server-wide announcement.",
-	Group = "DefaultAdmin",
+	Group = "Admin",
 	Args = {
 		{
 			Type = "string",

@@ -1,5 +1,6 @@
 local ROLES = {
 	["Owner"] = {
+		["PermissionLevel"] = 999,
 		["_IncludeRolesPermissions"] = {
 			"Admin",
 		},
@@ -8,6 +9,7 @@ local ROLES = {
 	},
 
 	["Admin"] = {
+		["PermissionLevel"] = 100,
 		["_IncludeRolesPermissions"] = {
 			"Default",
 		},
@@ -16,12 +18,12 @@ local ROLES = {
 	},
 
 	["Default"] = {
-		["DefaultAdmin"] = true,
-		["DefaultDebug"] = true,
-		["DefaultUtil"] = true,
-		["Help"] = true, --dont remove
-		["UserAlias"] = true, --dont remove
+		["PermissionLevel"] = 1,
 	},
+
+	["Help"] = {
+		["PermissionLevel"] = 0,
+	}
 }
 
 function IncludeRolesPermissions(role, addto)

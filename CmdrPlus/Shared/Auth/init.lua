@@ -5,7 +5,9 @@ local ROLES = require(script.Roles).GetRoles()
 local PLAYERS = nil
 local GROUPS = nil
 
-local Auth = {}
+local Auth = {
+	Roles = ROLES
+}
 local Cache = {}
 
 function Auth.IsPlayerPermitted(identifier)
@@ -89,12 +91,46 @@ function Auth.IsAuthorized(id, Permission)
 	end
 end
 
+function Auth.IsAuthorizedLevel(id, role)
+	local permissionlevel = Auth.GetRolePermissionLevel(role)
+	local player = Auth.IsPlayerPermitted(id)
+	local rank = Auth.IsRankPermitted(id)
+
+	local playerlevel = Auth.GetRolePermissionLevel(player)
+	local rankevel = Auth.GetRolePermissionLevel(rank)
+
+	if playerlevel <= permissionlevel then
+		return true
+	elseif rankevel <= permissionlevel then
+		return true
+	end
+
+	return false
+end
+
 function Auth.GetRolePermission(role, Permission)
 	if typeof(role) == "table" then
 		role = role.Alias
 	end
 
-	return ROLES[role][Permission]
+	return Auth.Roles[role][Permission]
+end
+
+function Auth.GetRolePermissionLevel(role)
+	if typeof(role) == "table" then
+		role = role.Alias
+	end
+
+	
+	if typeof(role) ~= "string" then
+		return 1
+	end
+	
+	if Auth.Roles[role] and Auth.Roles[role].PermissionLevel then
+		return Auth.Roles[role].PermissionLevel
+	else
+		return 1
+	end
 end
 
 function Auth.PermissionCount(role)

@@ -4,7 +4,7 @@ return {
 	Name = "position",
 	Aliases = { "pos" },
 	Description = "Returns Vector3 position of you or other players. Empty string is the player has no character.",
-	Group = "DefaultDebug",
+	Group = "Default",
 	Args = {
 		{
 			Type = "player",

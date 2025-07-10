@@ -2,7 +2,7 @@ return {
 	Name = "blink",
 	Aliases = { "b" },
 	Description = "Teleports you to where your mouse is hovering.",
-	Group = "DefaultDebug",
+	Group = "Default",
 	Args = {},
 
 	ClientRun = function(context)

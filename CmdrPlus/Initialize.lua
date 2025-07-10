@@ -35,7 +35,7 @@ return function(cmdr)
 	script.Parent.BuiltInTypes:Destroy()
 	script.Parent.BuiltInCommands.Name = "Server commands"
 
-	if StarterGui:FindFirstChild("Cmdr") == nil then
+	if StarterGui:WaitForChild("Cmdr", 2) == nil then
 		CreateGui()
 	end
 end

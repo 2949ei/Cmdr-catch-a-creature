@@ -276,7 +276,7 @@ function Window:BeginInput(input, gameProcessed)
 			local newText
 			local insertSpace = true
 			local command = self.AutoComplete.Command
-
+			print(command)
 			if command then
 				local lastArg = self.AutoComplete.Arg
 
