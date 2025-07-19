@@ -6,7 +6,8 @@ local PLAYERS = nil
 local GROUPS = nil
 
 local Auth = {
-	Roles = ROLES
+	Roles = ROLES,
+	Cmdr = nil
 }
 local Cache = {}
 
@@ -103,9 +104,9 @@ function Auth.IsAuthorizedLevel(id, role)
 	local playerlevel = Auth.GetRolePermissionLevel(player)
 	local rankevel = Auth.GetRolePermissionLevel(rank)
 
-	if playerlevel <= permissionlevel then
+	if playerlevel >= permissionlevel then
 		return true
-	elseif rankevel <= permissionlevel then
+	elseif rankevel >= permissionlevel then
 		return true
 	end
 
@@ -159,15 +160,18 @@ function Auth.PermissionCount(role)
 	return permissionCount
 end
 
+function Auth.init()
+	local Settings = Auth.Cmdr.Settings
+
+	PLAYERS = Settings.UserRanks
+	GROUPS = Settings.GroupRanks
+end
+
 Players.PlayerRemoving:Connect(function(Player)
 	Cache[Player.UserId] = nil
 end)
 
 return function(Cmdr)
-	local Settings = Cmdr.Settings
-
-	PLAYERS = Settings.UserRanks
-	GROUPS = Settings.GroupRanks
-
+	Auth.Cmdr = Cmdr
 	return Auth
 end

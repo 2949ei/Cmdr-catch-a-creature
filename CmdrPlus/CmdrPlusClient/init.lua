@@ -78,6 +78,9 @@ do
 		-- This sucks, and may be redone or removed
 		-- Proxies dispatch methods on to main Cmdr object
 		__index = function(self, k)
+			if k == "SetSettings" then
+				return self.Registry[k]
+			end
 			local r = self.Dispatcher[k]
 			if r and type(r) == "function" then
 				return function(_, ...)
@@ -87,10 +90,11 @@ do
 		end,
 	})
 
-	Cmdr.Settings = require(Shared.Settings)
+	Cmdr.Auth = require(Shared.Auth)(Cmdr)
 	Cmdr.Registry = require(Shared.Registry)(Cmdr)
 	Cmdr.Dispatcher = require(Shared.Dispatcher)(Cmdr)
-	Cmdr.Auth = require(Shared.Auth)(Cmdr)
+	Cmdr:SetSettings(require(Shared.Settings))
+	Cmdr.Auth.init()
 end
 
 if StarterGui:WaitForChild("Cmdr") and wait() and Player:WaitForChild("PlayerGui"):FindFirstChild("Cmdr") == nil then

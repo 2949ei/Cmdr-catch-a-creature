@@ -1,5 +1,6 @@
 local RunService = game:GetService("RunService")
 
+local Types = require(script.Parent.Types)
 local Util = require(script.Parent.Util)
 
 --[=[
@@ -175,12 +176,23 @@ local Registry = {
 	AutoExecBuffer = {},
 }
 
---[=[
-	Registers a type on the current realm (server/client), this function should be called from within the type definition ModuleScript.
-	@param name -- The name of the type, this must be unique, alphanumeric, and start with a lower-case letter or digit.
-	@param typeObject TypeDefinition
-	@within Registry
-]=]
+function Registry:SetSettings(Settings: Types.Settings)
+	local Roles = (self.Auth or self.Cmdr.Auth).Roles
+	local Cmdr = (self.Cmdr or self)
+
+	for id, role in Settings.UserRanks do
+		Settings.UserRanks[id] = Roles[role]
+	end
+
+	for index, groupdata in Settings.GroupRanks do
+		for id, role in groupdata.Ranks do
+			groupdata.Ranks[id] = Roles[role]
+		end
+	end
+	print(Settings)
+	Cmdr.Settings = Settings
+end
+
 function Registry:RegisterType(name: string, typeObject)
 	if not name or typeof(name) ~= "string" then
 		error("[Cmdr] Invalid type name provided: nil")
@@ -212,15 +224,6 @@ function Registry:RegisterType(name: string, typeObject)
 	end
 end
 
---[=[
-	Registers a Prefixed Union Type string on the current realm (server/client), this function should be called from within the type definition ModuleScript.
-
-	If there are already type prefixes for the given type name, they will be concatenated. This allows you to add prefixes to default types, like `players`.
-
-	@param name -- The name of the type.
-	@param union -- The string should omit the initial type name, so this string should begin with a prefix character, e.g. `# integer ! boolean`
-	@within Registry
-]=]
 function Registry:RegisterTypePrefix(name: string, union: string)
 	if not self.TypeAliases[name] then
 		self.TypeAliases[name] = name
@@ -229,25 +232,11 @@ function Registry:RegisterTypePrefix(name: string, union: string)
 	self.TypeAliases[name] = ("%s %s"):format(self.TypeAliases[name], union)
 end
 
---[=[
-	Allows you to register a name which will be expanded into a longer type which can be used as a command argument type.
-	For example, if you register the alias `stringOrNumber` it could be interpreted as `string # number` when used.
-
-	@param name -- The name of the type, this must be unique, alphanumeric, and start with a lower-case letter or digit.
-	@param alias -- The string should *include* the initial type name, e.g. `string # integer ! boolean`
-	@within Registry
-]=]
 function Registry:RegisterTypeAlias(name: string, alias: string)
 	assert(self.TypeAliases[name] == nil, `[Cmdr] Type alias {alias} already exists!`)
 	self.TypeAliases[name] = alias
 end
 
---[=[
-	Registers all types from within a container on both the server and client.
-
-	@server
-	@within Registry
-]=]
 function Registry:RegisterTypesIn(container: Instance)
 	for _, object in pairs(container:GetChildren()) do
 		if object:IsA("ModuleScript") then
@@ -260,26 +249,8 @@ function Registry:RegisterTypesIn(container: Instance)
 	end
 end
 
--- These are exactly the same thing. No one will notice. Except for you, dear reader.
---[=[
-	@method RegisterHooksIn
-	Registers all hooks from within a container on both the server and client.
-	If you want to add a hook only on the server or client – e.g. for logging – then you should use the Register.RegisterHook method instead.
-
-	@param container Instance
-	@server
-	@within Registry
-]=]
 Registry.RegisterHooksIn = Registry.RegisterTypesIn
 
---[=[
-	Register a command purely based on its definition.
-	Prefer using Registry:RegisterCommand for proper handling of client/server model.
-
-	@param commandObject CommandDefinition
-	@private
-	@within Registry
-]=]
 function Registry:RegisterCommandObject(commandObject)
 	for key in pairs(commandObject) do
 		if self.CommandMethods[key] == nil then
@@ -306,7 +277,6 @@ function Registry:RegisterCommandObject(commandObject)
 		self:FlushAutoExecBufferDeferred()
 	end
 
-	-- Unregister the old command if it exists...
 	local oldCommand = self.Commands[commandObject.Name:lower()]
 	if oldCommand and oldCommand.Aliases then
 		for _, alias in pairs(oldCommand.Aliases) do
@@ -325,14 +295,6 @@ function Registry:RegisterCommandObject(commandObject)
 	end
 end
 
---[=[
-	Registers a command definition and its server equivalent. Handles replicating the definition to the client.
-
-	@param filter (CommandDefinition -> boolean)? -- If present, will be passed a command definition which will then only be registered if the function returns `true`.
-
-	@server
-	@within Registry
-]=]
 function Registry:RegisterCommand(
 	commandScript: ModuleScript,
 	commandServerScript: ModuleScript?,
@@ -358,16 +320,6 @@ function Registry:RegisterCommand(
 	commandScript.Parent = self.Cmdr.ReplicatedRoot.Commands
 end
 
---[=[
-	Registers all commands from within a container on both the server and client.
-
-	Module scripts which include `Server` in their name will not be sent to the client.
-
-	@param filter ((CommandDefinition) -> boolean)? -- If present, will be passed a command definition which will then only be registered if the function returns `true`.
-
-	@server
-	@within Registry
-]=]
 function Registry:RegisterCommandsIn(container: Instance, filter: ((any) -> boolean)?)
 	local skippedServerScripts = {}
 	local usedServerScripts = {}
@@ -399,19 +351,6 @@ function Registry:RegisterCommandsIn(container: Instance, filter: ((any) -> bool
 	end
 end
 
---[=[
-	Registers the default commands on both the server and client.
-
-	The optional `arrayOrFunc` parameter can be provided with:
-
-	1. an array of strings — this will limit registration to only commands which have their `Group` property set to this
-	2. a function which takes in a CommandDefinition and returns a `boolean` — only if `true` is returned will the command be registered
-
-	@param arrayOrFunc {string} | (CommandDefinition) -> boolean | nil
-
-	@server
-	@within Registry
-]=]
 function Registry:RegisterDefaultCommands(arrayOrFunc: { string } | (any) -> boolean | nil)
 	assert(RunService:IsServer(), "[Cmdr] RegisterDefaultCommands cannot be called from the client.")
 
@@ -422,29 +361,15 @@ function Registry:RegisterDefaultCommands(arrayOrFunc: { string } | (any) -> boo
 	end or arrayOrFunc)
 end
 
---[=[
-	Returns the CommandDefinition from the given name, or nil if no command is found. Command aliases are also accepted.
-	@return CommandDefinition?
-	@within Registry
-]=]
 function Registry:GetCommand(name: string)
 	name = name or ""
 	return self.Commands[name:lower()]
 end
 
---[=[
-	Returns an array of all registers commands, not including aliases.
-	@return {CommandDefinition}
-	@within Registry
-]=]
 function Registry:GetCommands(): { any }
 	return self.CommandsArray
 end
 
---[=[
-	Returns an array of containing the names of all registered commands, not including aliases.
-	@within Registry
-]=]
 function Registry:GetCommandNames(): { string }
 	local commands = {}
 
@@ -455,17 +380,8 @@ function Registry:GetCommandNames(): { string }
 	return commands
 end
 
---[=[
-	@method GetCommandsAsStrings
-	@deprecated v1.8.0 -- This method was renamed to GetCommandNames in v1.8.0. The old name exists for backwards compatibility and should not be used for new work.
-	@within Registry
-]=]
 Registry.GetCommandsAsStrings = Registry.GetCommandNames
 
---[=[
-	Returns an array of containing the names of all registered types, not including aliases.
-	@within Registry
-]=]
 function Registry:GetTypeNames(): { string }
 	local typeNames = {}
 
@@ -476,34 +392,14 @@ function Registry:GetTypeNames(): { string }
 	return typeNames
 end
 
---[=[
-	Returns the type definition from the given name, or nil if no argument is found.
-	@return TypeDefinition?
-	@within Registry
-]=]
 function Registry:GetType(name: string)
 	return self.Types[name]
 end
 
---[=[
-	Returns a type name taking aliases into account. If there is no alias, the name parameter is simply returned as a pass through.
-	@return TypeDefinition | string
-	@within Registry
-]=]
 function Registry:GetTypeName(name: string): string | any
 	return self.TypeAliases[name] or name
 end
 
---[=[
-	Registers a hook on the current realm (server/client). This should probably be ran on the server or in a hook module script, but can also work on the client.
-
-	Hooks run in order of priority from lowest (running first) to highest.
-
-	@param hookName HookType
-	@param callback (CommandContext) -> string? -- returns nil for ok, string (errorText) for cancellation
-	@param priority -- If unspecified, the priority will default to `0`.
-	@within Registry
-]=]
 function Registry:RegisterHook(hookName: string, callback: (any) -> string?, priority: number)
 	if not self.Hooks[hookName] then
 		error(("[Cmdr] Invalid hook name: %q"):format(hookName), 2)
@@ -515,31 +411,12 @@ function Registry:RegisterHook(hookName: string, callback: (any) -> string?, pri
 	end)
 end
 
---[=[
-	@method AddHook
-	@deprecated v1.1.2 -- This method was renamed to RegisterHook in v1.1.2. The old name exists for backwards compatibility and should not be used for new work.
-	@param hookName HookType
-	@param callback (CommandContext) -> string? -- returns nil for ok, string (errorText) for cancellation
-	@param priority number -- If unspecified, the priority will default to `0`.
-	@within Registry
-]=]
 Registry.AddHook = Registry.RegisterHook
 
---[=[
-	Returns a table saved with the given name. Always returns the same table on subsequent calls. Useful for commands that require persistent state, like bind or ban.
-	This is the same as CommandContext.GetStore.
-	@return table
-	@within Registry
-]=]
 function Registry:GetStore(name: string)
 	return self.Stores[name]
 end
 
---[=[
-	Calls Registry.FlushAutoExecBuffer at the end of the frame.
-	@private
-	@within Registry
-]=]
 function Registry:FlushAutoExecBufferDeferred()
 	if self.AutoExecFlushConnection then
 		return
@@ -552,11 +429,6 @@ function Registry:FlushAutoExecBufferDeferred()
 	end)
 end
 
---[=[
-	Runs all pending auto exec commands in Registry.AutoExecBuffer.
-	@private
-	@within Registry
-]=]
 function Registry:FlushAutoExecBuffer()
 	for _, commandGroup in ipairs(self.AutoExecBuffer) do
 		for _, command in ipairs(commandGroup) do

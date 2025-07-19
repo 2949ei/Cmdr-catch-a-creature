@@ -8,108 +8,9 @@ local function unescapeOperators(text)
 	return text
 end
 
---[=[
-	@class ArgumentContext
-	Represents an individual argument within an individual command execution.
-]=]
-
 local Argument = {}
 Argument.__index = Argument
 
---[=[
-	@prop Command CommandContext
-	The command that this argument belongs to.
-	@readonly
-	@within ArgumentContext
-]=]
-
---[=[
-	@prop Type TypeDefinition
-	The type definition for this argument.
-	@readonly
-	@within ArgumentContext
-]=]
-
---[=[
-	@prop Name string
-	The name of this argument, shown on the autocomplete interface.
-	@readonly
-	@within ArgumentContext
-]=]
-
---[=[
-	@prop Object ArgumentDefinition
-	The raw argument definition.
-	@readonly
-	@within ArgumentContext
-]=]
-
---[=[
-	@prop Required boolean
-	Whether or not this argument was required.
-	@readonly
-	@within ArgumentContext
-]=]
-
---[=[
-	@prop Executor Player
-	The player that ran the command that this argument belongs to.
-	@readonly
-	@within ArgumentContext
-]=]
-
---[=[
-	@prop RawValue string
-	The raw, unparsed value for this argument.
-	@readonly
-	@within ArgumentContext
-]=]
-
---[=[
-	@prop RawSegments {string}
-	An array of strings representing the values in a comma-separated list, if applicable.
-	@readonly
-	@within ArgumentContext
-]=]
-
---[=[
-	@prop Prefix string
-	The prefix used in this argument (like `%` in `%Team`). Empty string if no prefix was used. See [Prefixed Union Types](/docs/commands#prefixed-union-types) for more details.
-	@readonly
-	@within ArgumentContext
-]=]
-
---[=[
-	@prop TextSegmentInProgress any
-	The text of the raw segment the user is currently typing.
-	@private
-	@within ArgumentContext
-]=]
-
---[=[
-	@prop RawSegmentsAreAutocomplete boolean
-	@private
-	@within ArgumentContext
-]=]
-
---[=[
-	@prop TransformedValues {any}
-	The transformed value (generated later).
-	@private
-	@within ArgumentContext
-]=]
-
---[=[
-	Returns a new ArgumentContext, an object that handles parsing and validating arguments
-	@private
-
-	@param command CommandContext -- The command that owns this argument
-	@param argumentDefinition ArgumentDefinition -- The raw argument definition
-	@param value any -- The raw, unparsed value
-	@return ArgumentContext
-
-	@within ArgumentContext
-]=]
 function Argument.new(command, argumentDefinition, value)
 	local self = {
 		Command = command,
@@ -148,11 +49,6 @@ function Argument.new(command, argumentDefinition, value)
 	return self
 end
 
---[=[
-	@private
-	@return any
-	@within ArgumentContext
-]=]
 function Argument:GetDefaultAutocomplete()
 	if self.Type.Autocomplete then
 		local strings, options = self.Type.Autocomplete(self:TransformSegment(""))
@@ -162,14 +58,6 @@ function Argument:GetDefaultAutocomplete()
 	return {}
 end
 
---[=[
-	Calls the transform function on this argument.
-	The return value(s) from this function are passed to all of the other argument methods.
-	Called automatically at instantiation.
-
-	@private
-	@within ArgumentContext
-]=]
 function Argument:Transform()
 	if #self.TransformedValues ~= 0 then
 		return
@@ -258,11 +146,6 @@ function Argument:Transform()
 	end
 end
 
---[=[
-	@param rawSegment any
-	@private
-	@within ArgumentContext
-]=]
 function Argument:TransformSegment(rawSegment): any
 	if self.Type.Transform then
 		return self.Type.Transform(rawSegment, self.Executor)
@@ -271,21 +154,10 @@ function Argument:TransformSegment(rawSegment): any
 	end
 end
 
---[=[
-	Returns the transformed value from this argument, see Types.
-	@within ArgumentContext
-]=]
 function Argument:GetTransformedValue(segment: number): ...any
 	return unpack(self.TransformedValues[segment])
 end
 
---[=[
-	Validates that the argument will work without any type errors.
-
-	@param isFinal any
-	@private
-	@within ArgumentContext
-]=]
 function Argument:Validate(isFinal: boolean?): (boolean, string?)
 	if self.RawValue == nil or #self.RawValue == 0 and self.Required == false then
 		return true
@@ -320,13 +192,6 @@ function Argument:Validate(isFinal: boolean?): (boolean, string?)
 	end
 end
 
---[=[
-	Gets a list of all possible values that could match based on the current value.
-
-	@return any
-	@private
-	@within ArgumentContext
-]=]
 function Argument:GetAutocomplete()
 	if self.Type.Autocomplete then
 		return self.Type.Autocomplete(self:GetTransformedValue(#self.TransformedValues))
@@ -335,11 +200,6 @@ function Argument:GetAutocomplete()
 	end
 end
 
---[=[
-	@return any
-	@private
-	@within ArgumentContext
-]=]
 function Argument:ParseValue(i: number)
 	if self.Type.Parse then
 		return self.Type.Parse(self:GetTransformedValue(i))
@@ -348,11 +208,6 @@ function Argument:ParseValue(i: number)
 	end
 end
 
---
---[=[
-	Returns the parsed (final) value for this argument.
-	@within ArgumentContext
-]=]
 function Argument:GetValue(): any
 	if #self.RawValue == 0 and not self.Required and self.Object.Default ~= nil then
 		return self.Object.Default

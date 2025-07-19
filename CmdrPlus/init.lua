@@ -1,4 +1,5 @@
 local RunService = game:GetService("RunService")
+local Types = require(script.Shared.Types)
 local Util = require(script.Shared:WaitForChild("Util"))
 
 if RunService:IsServer() == false then
@@ -54,10 +55,11 @@ do
 		end,
 	})
 
-	Cmdr.Settings = require(script.Shared.Settings)
+	Cmdr.Auth = require(script.Shared.Auth)(Cmdr)
 	Cmdr.Registry = require(script.Shared.Registry)(Cmdr)
 	Cmdr.Dispatcher = require(script.Shared.Dispatcher)(Cmdr)
-	Cmdr.Auth = require(script.Shared.Auth)(Cmdr)
+	Cmdr:SetSettings(require(script.Shared.Settings))
+	Cmdr.Auth.init()
 
 	require(script.Initialize)(Cmdr)
 end

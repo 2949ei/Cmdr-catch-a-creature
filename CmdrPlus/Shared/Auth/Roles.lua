@@ -11,13 +11,34 @@ local ROLES = {
 	["Admin"] = {
 		["PermissionLevel"] = 100,
 		["_IncludeRolesPermissions"] = {
-			"Default",
+			"Moderator",
 		},
 		["Kickable"] = true,
 		["Bannable"] = false,
 	},
 
+	["Moderator"] = {
+		["PermissionLevel"] = 50,
+		["_IncludeRolesPermissions"] = {
+			"VIP",
+		},
+		["Kickable"] = true,
+		["Bannable"] = true,
+	},
+
+	["VIP"] = {
+		["PermissionLevel"] = 10,
+		["_IncludeRolesPermissions"] = {
+			"Default",
+		},
+		["Kickable"] = true,
+		["Bannable"] = true,
+	},
+
 	["Default"] = {
+		["_IncludeRolesPermissions"] = {
+			"Help",
+		},
 		["PermissionLevel"] = 1,
 	},
 

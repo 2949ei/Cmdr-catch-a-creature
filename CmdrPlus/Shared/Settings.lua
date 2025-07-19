@@ -1,6 +1,6 @@
-local Roles = require(script.Parent.Auth.Roles).GetRoles()
+local Types = require(script.Parent.Types)
 
-local Settings = {
+local Settings: Types.Settings = {
 	ActivationKeys = { Enum.KeyCode.F2 }, -- Configurable, and you can choose multiple keys
 	CmdActivationKeys = { Enum.KeyCode.F3 }, -- Configurable, and you can choose multiple keys
 	Colors = {
@@ -10,15 +10,14 @@ local Settings = {
 	},
 	UserRanks = {
 		--[userid] = Role
-		[game.CreatorId] = Roles.Owner,
+		[game.CreatorId] = "Owner",
 	},
 	GroupRanks = {
 		{
 			GroupId = 0,
 			Ranks = {
-				[255] = Roles.Owner,
-				[253] = Roles.Admin,
-				[252] = nil,
+				[255] = "Owner",
+				[253] = "Admin",
 			},
 		},
 	},
