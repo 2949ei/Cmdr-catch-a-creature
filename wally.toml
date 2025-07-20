@@ -1,11 +1,13 @@
 [package]
 name = "robocrafterlp/cmdrplus"
 description = "Extensible command console for Roblox developers with a cmd menu"
-version = "1.0.9"
+version = "1.1.0"
 license = "MIT"
 registry = "https://github.com/UpliftGames/wally-index"
 realm = "shared"
-exclude = ["assets", "docs","sourcemap.json", "node_modules", ".github", "moonwave.toml", "package-lock.json", "package.json"]
-include = ["CmdrPlus", "default.project.json", "LICENSE"]
+exclude = ["**"]
+include = ["src", "src/*", "wally.toml", "default.project.json", "sourcemap.json", "selene.toml"]
 
 [dependencies]
+Networker = "leifstout/networker@0.3.0"
+Sift = "csqrl/sift@0.0.11"

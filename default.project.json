@@ -1,6 +1,9 @@
 {
-  "name": "cmdrplus",
-  "tree": {
-    "$path": "CmdrPlus"
-  }
+	"name": "cmdrplus",
+	"tree": {
+		"$path": "src",
+		"Packages": {
+			"$path": "Packages"
+		}
+	}
 }

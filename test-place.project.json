@@ -1,14 +1,29 @@
 {
-  "name": "cmdrplus",
-  "tree": {
-    "$className": "DataModel",
-    "$ignoreUnknownInstances": true,
-    "ServerScriptService": {
-      "$className": "ServerScriptService",
+	"name": "cmdrplusv2",
+	"tree": {
+		"$className": "DataModel",
+    
+		"ReplicatedStorage": {
+			"$className": "ReplicatedStorage",
+			"CmdrPlus": {
+				"$path": "default.project.json"
+			},
+			"AutoRegisterFile": {
+				"$path": "test/AutoRegisterFile.luau"
+			}
+		},
+		"ServerScriptService": {
+			"Server": {
+				"$path": "test/Server.server.luau"
+			}
+		},
 
-      "CmdrPlus": {
-        "$path": "./CmdrPlus"
-      }
-    }
-  }
+		"StarterPlayer": {
+			"StarterPlayerScripts": {
+				"$className": "StarterPlayerScripts",
+				"$ignoreUnknownInstances": true,
+				"Client": { "$path": "test/Client.client.luau" }
+			}
+		}
+	}
 }

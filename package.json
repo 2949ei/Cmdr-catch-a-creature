@@ -1,0 +1,21 @@
+{
+	"name": "genrojotree",
+	"version": "1.0.0",
+	"main": "index.js",
+	"scripts": {
+		"wally:install": "wally install && rojo sourcemap default.project.json --output sourcemap.json && wally-package-types -s sourcemap.json Packages/"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"description": "",
+	"nodemonConfig": {
+		"ignore": [
+			"default.project.json",
+			"sourcemap.json"
+		],
+		"watch": [
+			"src/**/*"
+		]
+	}
+}

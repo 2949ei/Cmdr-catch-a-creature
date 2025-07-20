@@ -39,9 +39,11 @@ luac.out
 *.x86_64
 *.hex
 
-node_modules/
-docs/CHANGELOG.md
+Packages/
 .vscode
-roblox.toml
 sourcemap.json
-build
+
+
+# Added by cargo
+
+/target
