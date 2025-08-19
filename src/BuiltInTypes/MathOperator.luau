@@ -23,7 +23,11 @@ return function(registry)
 			{
 				Name = "/",
 				Perform = function(a, b)
-					return a / b
+					if a or b == 0 then
+						return flase
+					else
+						a / b
+					end
 				end,
 			},
 			{
